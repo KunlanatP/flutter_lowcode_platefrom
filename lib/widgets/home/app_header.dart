@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_lowcode_plateform/states/home/app_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart' as provider;
 
 import '../../main.dart';
 
-class AppHeader extends StatefulWidget {
+class AppHeader extends ConsumerStatefulWidget {
   final Color primaryBlue;
   final Color lightBlue;
   final VoidCallback onCreateApp;
@@ -16,16 +18,18 @@ class AppHeader extends StatefulWidget {
   });
 
   @override
-  State<AppHeader> createState() => _AppHeaderState();
+  ConsumerState<AppHeader> createState() => _AppHeaderState();
 }
 
-class _AppHeaderState extends State<AppHeader> {
+class _AppHeaderState extends ConsumerState<AppHeader> {
   @override
   Widget build(BuildContext context) {
+    ref.watch(appList);
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        // color: Colors.white,
+        color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -49,24 +53,10 @@ class _AppHeaderState extends State<AppHeader> {
   }
 
   Widget _buildLogoSection() {
-    return Row(
-      children: [
-        // Logo
-        SizedBox(
-          width: 40,
-          child: Image.asset('assets/logo.png', fit: BoxFit.contain),
-        ),
-        const SizedBox(width: 16),
-        // Title
-        Text(
-          'Flutter Designer',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: widget.primaryBlue,
-          ),
-        ),
-      ],
+    // Logo
+    return SizedBox(
+      width: 40,
+      child: Image.asset('assets/logo.png', fit: BoxFit.contain),
     );
   }
 
@@ -75,6 +65,9 @@ class _AppHeaderState extends State<AppHeader> {
       child: Container(
         constraints: const BoxConstraints(maxWidth: 300),
         child: TextField(
+          onChanged: (value) async {
+            await ref.read(appController).fetchAllApplications(0, 20, value);
+          },
           decoration: InputDecoration(
             hintText: 'Search apps...',
             prefixIcon: Icon(Icons.search, color: widget.primaryBlue),
@@ -107,7 +100,7 @@ class _AppHeaderState extends State<AppHeader> {
   }
 
   Widget _buildThemeSwitcher() {
-    return Consumer<ThemeProvider>(
+    return provider.Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return IconButton(
           onPressed: () => themeProvider.toggleTheme(),

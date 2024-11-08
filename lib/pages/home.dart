@@ -1,23 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lowcode_plateform/states/home/app_state.dart';
 import 'package:flutter_lowcode_plateform/widgets/home/create_app_dialog.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vrouter/vrouter.dart';
 
 import '../widgets/home/app_grid.dart';
 import '../widgets/home/app_header.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
+
   final Color primaryBlue = const Color(0xFF2563EB);
   final Color secondaryBlue = const Color(0xFF1D4ED8);
   final Color lightBlue = const Color(0xFFEFF6FF);
   bool isDarkMode = false;
 
-  final List<Map<String, dynamic>> apps = [];
+  @override
+  void initState() {
+    ref.read(appController).init();
+  
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +39,12 @@ class _HomePageState extends State<HomePage> {
             lightBlue: lightBlue,
             onCreateApp: _showCreateAppDialog,
           ),
-          Expanded(
-            child: AppGrid(apps: apps),
+           Expanded(
+            child: ApplicationList(
+              onAppSelected: (appID) {
+                VRouter.of(context).to('/editor/$appID');
+              },
+            ),
           ),
         ],
       ),
@@ -41,7 +54,8 @@ class _HomePageState extends State<HomePage> {
   void _showCreateAppDialog() {
     final nameController = TextEditingController();
     final versionController = TextEditingController(text: '1.0.0');
-    final namespaceController = TextEditingController(text: 'com.example.');
+    final bundleController = TextEditingController(text: 'com.example.');
+    final descController = TextEditingController(text: 'A new Flutter project.');
     String selectedPlatform = 'mobile';
 
     showDialog(
@@ -50,7 +64,8 @@ class _HomePageState extends State<HomePage> {
         return CreateAppDialog(
           nameController: nameController,
           versionController: versionController,
-          namespaceController: namespaceController,
+          bundleController: bundleController,
+          descController: descController,
           selectedPlatform: selectedPlatform,
           onPlatformChanged: (value) {
             selectedPlatform = value;

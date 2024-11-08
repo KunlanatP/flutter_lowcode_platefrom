@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'theme/app_theme.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_lowcode_plateform/pages/page_editor.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart' as provider;
+import 'package:vrouter/vrouter.dart';
 
 import 'pages/index.dart';
+import 'theme/app_theme.dart';
 
 class ThemeProvider with ChangeNotifier {
   bool _isDarkMode = false;
@@ -15,26 +20,53 @@ class ThemeProvider with ChangeNotifier {
 }
 
 void main() {
+  GoogleFonts.config.allowRuntimeFetching = true;
+  WidgetsFlutterBinding.ensureInitialized();
+  // WidgetFactory.ensureInitialized();
+
   runApp(
-    ChangeNotifierProvider(
+    provider.ChangeNotifierProvider(
       create: (_) => ThemeProvider(),
-      child: const MyApp(),
+      child: const riverpod.ProviderScope(child: FlutterDesignerApp()),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class FlutterDesignerApp extends StatefulWidget {
+  const FlutterDesignerApp({super.key});
+
+  @override
+  State<FlutterDesignerApp> createState() => _FlutterDesignerAppState();
+}
+
+class _FlutterDesignerAppState extends State<FlutterDesignerApp> {
+  final _locale = const Locale('en');
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
+    return provider.Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
-        return MaterialApp(
+        return VRouter(
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
-          themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          home: const HomePage(),
+          themeMode:
+              themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: _locale,
+          // This transition will be applied to every route
+          buildTransition: (animation1, _, child) {
+            return FadeTransition(opacity: animation1, child: child);
+          },
+          routes: [
+            VWidget(
+              path: '/',
+              widget: const HomePage(),
+              stackedRoutes: [
+                VWidget(path: '/editor/:appID', widget: const PageEditor()),
+              ],
+            ),
+          ],
         );
       },
     );

@@ -1,0 +1,19 @@
+{
+  "$schema": "./page_schema.json",
+  "type": "page",
+  "id": "a92ab2bc-bcb0-408e-a02d-fe350bc0593f",
+  "version": 1,
+  "theme": {},
+  "meta": {
+    "name": "Home"
+  },
+  "appbar": {},
+  "state": {},
+  "providers": {},
+  "scrollable": {},
+  "body": {
+    "type": "container",
+    "id": "#container",
+    "args": {}
+  }
+}

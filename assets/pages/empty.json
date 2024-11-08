@@ -1,0 +1,47 @@
+{
+  "$schema": "./page_schema.json",
+  "type": "page",
+  "id": "a92ab2bc-bcb0-408e-a02d-fe350bc0593f",
+  "version": 1,
+  "theme": {},
+  "meta": {
+    "name": "Home"
+  },
+  "appbar": {},
+  "state": {},
+  "providers": {},
+  "scrollable": {},
+  "body": {
+    "type": "container",
+    "id": "3c42cb67-5035-409f-a76f-78ef045dbb81",
+    "args": {},
+    "child": {
+      "type": "column",
+      "id": "2decede3-75af-4f52-a522-a751a070d9b2",
+      "children": [
+        {
+          "type": "container",
+          "id": "42ddb41f-74a6-4a51-aae3-326179cd0cc8",
+          "args": {
+            "width": "infinity",
+            "height": 120,
+            "decoration": {
+              "color": "#ffddee33"
+            }
+          }
+        },
+        {
+          "type": "container",
+          "id": "64157031-1234-400e-afb1-7526c233b2b5",
+          "args": {
+            "width": "infinity",
+            "height": 120,
+            "decoration": {
+              "color": "#ff28FD32"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
