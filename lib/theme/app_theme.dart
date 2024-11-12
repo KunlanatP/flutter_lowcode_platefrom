@@ -1,29 +1,32 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static ThemeData lightTheme = ThemeData(
-    brightness: Brightness.light,
-    primaryColor: const Color(0xFF2563EB),
-    scaffoldBackgroundColor: const Color(0xFFEFF6FF),
+  // Sophisticated Neutrals Theme
+  static final lightTheme = ThemeData(
+    primaryColor: const Color(0xFF3D4B6C),
+    secondaryHeaderColor: const Color(0xFF7790C9),
+    scaffoldBackgroundColor: const Color(0xFFF9FAFF),
     cardColor: Colors.white,
-    iconTheme: const IconThemeData(color: Color(0xFF2563EB)),
-    textTheme: const TextTheme(
-      titleLarge: TextStyle(color: Color(0xFF2563EB), fontWeight: FontWeight.bold),
-      bodyLarge: TextStyle(color: Color(0xFF1F2937)),
-      bodyMedium: TextStyle(color: Color(0xFF4B5563)),
+    colorScheme: const ColorScheme.light(
+      primary: Color(0xFF3D4B6C),
+      secondary: Color(0xFF7790C9),
+      tertiary: Color(0xFFB4C6E7),
+      surface: Colors.white,
+      background: Color(0xFFF9FAFF),
     ),
   );
 
-  static ThemeData darkTheme = ThemeData(
-    brightness: Brightness.dark,
-    primaryColor: const Color(0xFF60A5FA),
-    scaffoldBackgroundColor: const Color(0xFF1F2937),
-    cardColor: const Color(0xFF374151),
-    iconTheme: const IconThemeData(color: Color(0xFF60A5FA)),
-    textTheme: const TextTheme(
-      titleLarge: TextStyle(color: Color(0xFF60A5FA), fontWeight: FontWeight.bold),
-      bodyLarge: TextStyle(color: Colors.white),
-      bodyMedium: TextStyle(color: Color(0xFFD1D5DB)),
+  static final darkTheme = ThemeData(
+    primaryColor: const Color(0xFF2A3346),
+    secondaryHeaderColor: const Color(0xFF4A5C8B),
+    scaffoldBackgroundColor: const Color(0xFF1A1D24),
+    cardColor: const Color(0xFF252A35),
+    colorScheme: const ColorScheme.dark(
+      primary: Color(0xFF4A5C8B),
+      secondary: Color(0xFF7790C9),
+      tertiary: Color(0xFF3D4B6C),
+      surface: Color(0xFF252A35),
+      background: Color(0xFF1A1D24),
     ),
   );
 }

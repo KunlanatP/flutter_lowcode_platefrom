@@ -511,7 +511,7 @@ packages:
       path: "../json_theme/json_theme"
       relative: true
     source: path
-    version: "7.0.0-dev.1"
+    version: "6.5.3+5"
   json_theme_annotation:
     dependency: transitive
     description:

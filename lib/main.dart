@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_lowcode_plateform/pages/page_editor.dart';
+import 'package:flutter_lowcode_plateform/pages/editor/page_editor.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart' as provider;

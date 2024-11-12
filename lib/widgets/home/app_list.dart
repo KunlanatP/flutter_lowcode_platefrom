@@ -23,7 +23,10 @@ class ApplicationList extends ConsumerWidget {
         if (apps!.data.isEmpty) {
           return const Center(child: Text('No apps found'));
         }
-        return _buildAppList(context, ref, apps.data);
+        return Align(
+          alignment: Alignment.topLeft,
+          child: _buildAppList(context, ref, apps.data),
+        );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (_, __) => const Center(child: Text('Error')),
@@ -37,20 +40,25 @@ class ApplicationList extends ConsumerWidget {
   ) {
     return Padding(
       padding: const EdgeInsets.all(24),
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          crossAxisSpacing: 24,
-          mainAxisSpacing: 24,
-          childAspectRatio: 1.2,
-        ),
-        itemCount: apps.length,
-        itemBuilder: (context, index) => OWOnClick(
-          onTap: () {
-            ref.read(appController).fetchAppByID(apps[index].id!);
-            onAppSelected?.call(apps[index].id!);
-          },
-          child: AppCard(app: apps[index]),
+      child: SingleChildScrollView(
+        child: Wrap(
+          alignment: WrapAlignment.start,
+          crossAxisAlignment: WrapCrossAlignment.start,
+          spacing: 24,
+          runSpacing: 24,
+          children: apps
+              .map((app) => SizedBox(
+                    width: 250,
+                    height: 250,
+                    child: OWOnClick(
+                      onTap: () {
+                        ref.read(appController).fetchAppByID(app.id!);
+                        onAppSelected?.call(app.id!);
+                      },
+                      child: AppCard(app: app),
+                    ),
+                  ))
+              .toList(),
         ),
       ),
     );
