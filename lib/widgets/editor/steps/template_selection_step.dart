@@ -1,5 +1,13 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lowcode_plateform/simple_datas/widgets/appbar.dart';
+import 'package:flutter_lowcode_plateform/simple_datas/widgets/card.dart';
+import 'package:flutter_lowcode_plateform/simple_datas/widgets/drawer.dart';
+import 'package:flutter_lowcode_plateform/simple_datas/widgets/form.dart';
+import 'package:flutter_lowcode_plateform/simple_datas/widgets/grid_view.dart';
+import 'package:flutter_lowcode_plateform/simple_datas/widgets/list_view.dart';
+import 'package:flutter_lowcode_plateform/simple_datas/widgets/scaffold.dart';
+import 'package:flutter_lowcode_plateform/simple_datas/widgets/tabBar.dart';
 import 'package:flutter_lowcode_plateform/states/page_creation_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,26 +16,57 @@ import '../components/template_card.dart';
 class TemplateSelectionStep extends ConsumerWidget {
   final String? currTemplate;
 
-  const TemplateSelectionStep({
+  TemplateSelectionStep({
     super.key,
     required this.currTemplate,
   });
 
-  final templates = const {
+  final templates = {
     'Default Widgets': [
-      {'name': 'Blank', 'icon': FluentIcons.page_fit_24_regular},
-      {'name': 'Scaffold', 'icon': FluentIcons.layout_cell_four_24_regular},
-      {'name': 'AppBar', 'icon': FluentIcons.navigation_24_regular},
-      {'name': 'TabBar', 'icon': FluentIcons.tab_desktop_24_regular},
+      {
+        'name': 'Blank',
+        'icon': FluentIcons.page_fit_24_regular,
+        'content': scaffoldWidget,
+      },
+      {
+        'name': 'Drawer',
+        'icon': FluentIcons.navigation_24_regular,
+        'content': drawerWidget,
+      },
+      {
+        'name': 'AppBar',
+        'icon': FluentIcons.phone_status_bar_24_regular,
+        'content': appBarWidget,
+      },
+      {
+        'name': 'TabBar',
+        'icon': FluentIcons.tab_desktop_24_regular,
+        'content': tabBarWidget,
+      },
     ],
     'Simple Widgets': [
-      {'name': 'List View', 'icon': FluentIcons.list_24_regular},
-      {'name': 'Grid View', 'icon': FluentIcons.grid_24_regular},
-      {'name': 'Form', 'icon': FluentIcons.form_24_regular},
-      {'name': 'Card', 'icon': FluentIcons.card_ui_24_regular},
+      {
+        'name': 'List View',
+        'icon': FluentIcons.apps_list_24_regular,
+        'content': listViewWidget,
+      },
+      {
+        'name': 'Grid View',
+        'icon': FluentIcons.grid_24_regular,
+        'content': gridViewWidget,
+      },
+      {
+        'name': 'Form',
+        'icon': FluentIcons.form_24_regular,
+        'content': formWidget,
+      },
+      {
+        'name': 'Card',
+        'icon': FluentIcons.card_ui_24_regular,
+        'content': cardWidget,
+      },
     ],
   };
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Column(

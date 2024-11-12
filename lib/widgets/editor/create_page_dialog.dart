@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../models/page/page_creation_state.dart';
 import '../../states/page_creation_state.dart';
 import 'components/preview_panel.dart';
 import 'components/step_indicator.dart';

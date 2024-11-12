@@ -65,7 +65,7 @@ class _UIEmptyContentPageState extends ConsumerState<EmptyContentPage> {
                       context: context,
                       builder: (context) => StatefulBuilder(
                         builder: (context, setState) {
-                          return CreatePageDialog();
+                          return const CreatePageDialog();
                         },
                       ),
                     ),

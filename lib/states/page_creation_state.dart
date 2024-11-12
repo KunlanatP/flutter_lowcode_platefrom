@@ -3,5 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 AutoDisposeStateProvider<PageCreationState> pageCreationState =
     StateProvider.autoDispose<PageCreationState>((ref) {
-  return PageCreationState();
+  return PageCreationState(
+    currentStep: 0,
+    pageName: '',
+    selectedPageType: 'StatelessWidget',
+    selectedTemplate: 'Blank',
+  );
 });

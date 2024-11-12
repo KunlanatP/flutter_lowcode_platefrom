@@ -42,12 +42,14 @@ class TemplateCard extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    template['icon'],
-                    size: 32,
-                    color: isSelected
-                        ? Theme.of(context).colorScheme.primary
-                        : const Color(0xFF1E293B),
+                  Center(
+                    child: Icon(
+                      template['icon'],
+                      size: 32,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.primary
+                          : const Color(0xFF1E293B),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(

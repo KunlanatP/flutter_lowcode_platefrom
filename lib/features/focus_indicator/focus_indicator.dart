@@ -6,17 +6,16 @@ import 'package:render_engine/render_engine.dart';
 
 import '../../states/canvas/canvas_controller.dart';
 import '../../states/canvas/canvas_edit_model.dart';
-import '../hover_indicator/hover_indicator.dart';
 import 'focus_state.dart';
 
 const _kBorder = 2.0;
 
 class FocusIndicator extends ConsumerStatefulWidget {
   const FocusIndicator({
-    Key? key,
+    super.key,
     required this.refKey,
     required this.zoomLevel,
-  }) : super(key: key);
+  });
 
   final GlobalKey refKey;
   final double zoomLevel;
@@ -34,52 +33,39 @@ class _FocusIndicatorState extends ConsumerState<FocusIndicator> {
   @override
   Widget build(BuildContext context) {
     final focus = ref.watch(focusState);
+    if (focus == null) return const SizedBox.shrink();
 
-    if (focus == null) {
-      return const Zero();
-    }
     final rect = widget.refKey.currentContext?.getClientRect();
     final clientRect = focus.getClientRect();
-    if (clientRect == null || rect == null) {
-      return const Zero();
-    }
+    if (clientRect == null || rect == null) return const SizedBox.shrink();
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        titleWidgetName(
-          clientRect: clientRect,
-          rect: rect,
-          focus: focus,
-        ),
-        positionWidgetFocus(
-          clientRect: clientRect,
-          rect: rect,
-          focus: focus,
-        ),
-      ],
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      child: Stack(
+        children: [
+          _buildFocusBox(clientRect, rect, focus),
+          _buildTitleBar(clientRect, rect, focus),
+        ],
+      ),
     );
   }
 
-  dynamic positionWidgetFocus({
-    required Rect clientRect,
-    required Rect rect,
-    required WidgetContext focus,
-  }) {
-    var _height = (_kBorder / 2) + clientRect.height;
-    var _top = (-(_kBorder / 2) + clientRect.top - rect.top) / widget.zoomLevel;
+  Widget _buildFocusBox(Rect clientRect, Rect rect, WidgetContext focus) {
+    final height = focus.type == 'modal'
+        ? (_kBorder / 2) + clientRect.height / 2
+        : (_kBorder / 2) + clientRect.height;
 
-    if (focus.type == 'modal') {
-      _height = (_kBorder / 2) + clientRect.height / 2;
-      _top = (-(_kBorder / 2) + clientRect.top - rect.top) / widget.zoomLevel +
-          _height;
-    }
+    final top = focus.type == 'modal'
+        ? (-(_kBorder / 2) + clientRect.top - rect.top) / widget.zoomLevel +
+            height
+        : (-(_kBorder / 2) + clientRect.top - rect.top) / widget.zoomLevel;
 
     return Positioned(
       width: (_kBorder / 2) + clientRect.width,
-      height: _height,
+      height: height,
       left: (-(_kBorder / 2) + clientRect.left - rect.left) / widget.zoomLevel,
-      top: _top,
+      top: top,
       child: IgnorePointer(
         ignoring: true,
         child: DecoratedBox(
@@ -91,24 +77,20 @@ class _FocusIndicatorState extends ConsumerState<FocusIndicator> {
     );
   }
 
-  dynamic titleWidgetName({
-    required Rect clientRect,
-    required Rect rect,
-    required WidgetContext focus,
-  }) {
+  Widget _buildTitleBar(Rect clientRect, Rect rect, WidgetContext focus) {
     final data = ref.watch(canvasNotifier);
     final parentFocus = getWidgetFromPath(data.value!, focus.path);
     final state = focus.widgetData['props']?['state']?['id'];
 
-    var _top = (clientRect.top - rect.top - 25) / widget.zoomLevel;
+    final top = focus.type == 'modal'
+        ? (clientRect.top - rect.top - 25) / widget.zoomLevel +
+            (_kBorder / 2) +
+            clientRect.height / 2
+        : (clientRect.top - rect.top - 25) / widget.zoomLevel;
 
-    if (focus.type == 'modal') {
-      final _height = (_kBorder / 2) + clientRect.height / 2;
-      _top = (clientRect.top - rect.top - 25) / widget.zoomLevel + _height;
-    }
     return Positioned(
       left: (-(_kBorder / 2) + clientRect.left - rect.left) / widget.zoomLevel,
-      top: _top,
+      top: top,
       child: Container(
         height: 35,
         decoration: BoxDecoration(
@@ -119,160 +101,9 @@ class _FocusIndicatorState extends ConsumerState<FocusIndicator> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              focus.title,
-              style: const TextStyle(color: Colors.white),
-            ),
+            Text(focus.title, style: const TextStyle(color: Colors.white)),
             const SizedBox(width: 10),
-            InkWell(
-              onHover: (value) {
-                setState(() {
-                  _colorStart = value;
-                });
-              },
-              onTap: () async {
-                final pathSplit = focus.path.toString().split('/');
-                int indexWidget;
-                final pathCheck = focus.path[focus.path.length - 2];
-                String path;
-                if (pathCheck == '/') {
-                  path = focus.path.substring(0, focus.path.length - 2);
-                  indexWidget = int.parse(pathSplit[pathSplit.length - 1]);
-                } else {
-                  path = focus.path.substring(0, focus.path.length - 3);
-                  indexWidget = int.parse(pathSplit[pathSplit.length - 2]);
-                }
-                if (indexWidget > 0) {
-                  await ref.read(canvasController).moveWidget(
-                        MoveWidgetAction(
-                            from: focus.path,
-                            path: '$path/0',
-                            op: Operation.move),
-                      );
-                }
-                _colorStart = false;
-              },
-              child: Tooltip(
-                message: 'Start',
-                child: Icon(
-                  UiIcons.chevron_double_left,
-                  color: _colorStart == true ? Colors.lightBlue : Colors.white,
-                  size: 15,
-                ),
-              ),
-            ),
-            InkWell(
-              onHover: (value) {
-                setState(() {
-                  _colorPrev = value;
-                });
-              },
-              onTap: () async {
-                final pathSplit = focus.path.toString().split('/');
-                int indexWidget;
-                final pathCheck = focus.path[focus.path.length - 2];
-                String path;
-                if (pathCheck == '/') {
-                  path = focus.path.substring(0, focus.path.length - 2);
-                  indexWidget = int.parse(pathSplit[pathSplit.length - 1]);
-                } else {
-                  path = focus.path.substring(0, focus.path.length - 3);
-                  indexWidget = int.parse(pathSplit[pathSplit.length - 2]);
-                }
-                if (indexWidget - 1 >= 0) {
-                  await ref.read(canvasController).moveWidget(
-                        MoveWidgetAction(
-                            from: focus.path,
-                            path: '$path/${indexWidget - 1}',
-                            op: Operation.move),
-                      );
-                }
-                _colorPrev = false;
-              },
-              child: Tooltip(
-                message: 'Prev',
-                child: Icon(
-                  UiIcons.chevron_left,
-                  color: _colorPrev == true ? Colors.lightBlue : Colors.white,
-                  size: 15,
-                ),
-              ),
-            ),
-            InkWell(
-              onHover: (value) {
-                setState(() {
-                  _colorNext = value;
-                });
-              },
-              onTap: () async {
-                final pathSplit = focus.path.toString().split('/');
-                int indexWidget;
-                final pathCheck = focus.path[focus.path.length - 2];
-                String path;
-                if (pathCheck == '/') {
-                  path = focus.path.substring(0, focus.path.length - 2);
-                  indexWidget = int.parse(pathSplit[pathSplit.length - 1]);
-                } else {
-                  path = focus.path.substring(0, focus.path.length - 3);
-                  indexWidget = int.parse(pathSplit[pathSplit.length - 2]);
-                }
-                if (indexWidget + 1 < parentFocus.length) {
-                  await ref.read(canvasController).moveWidget(
-                        MoveWidgetAction(
-                            from: focus.path,
-                            path: '$path/${indexWidget + 1}',
-                            op: Operation.move),
-                      );
-                }
-                _colorNext = false;
-              },
-              child: Tooltip(
-                message: 'Next',
-                child: Icon(
-                  UiIcons.chevron_right,
-                  color: _colorNext == true ? Colors.lightBlue : Colors.white,
-                  size: 15,
-                ),
-              ),
-            ),
-            InkWell(
-              onHover: (value) {
-                setState(() {
-                  _colorEnd = value;
-                });
-              },
-              onTap: () async {
-                final pathSplit = focus.path.toString().split('/');
-                int indexWidget;
-                final pathCheck = focus.path[focus.path.length - 2];
-                String path;
-                if (pathCheck == '/') {
-                  path = focus.path.substring(0, focus.path.length - 2);
-                  indexWidget = int.parse(pathSplit[pathSplit.length - 1]);
-                } else {
-                  path = focus.path.substring(0, focus.path.length - 3);
-                  indexWidget = int.parse(pathSplit[pathSplit.length - 2]);
-                }
-                if (indexWidget < parentFocus.length - 1) {
-                  await ref.read(canvasController).moveWidget(
-                        MoveWidgetAction(
-                            from: focus.path,
-                            path: '$path/${parentFocus.length - 1}',
-                            op: Operation.move),
-                      );
-                }
-                _colorEnd = false;
-              },
-              child: Tooltip(
-                message: 'End',
-                child: Icon(
-                  UiIcons.chevron_double_right,
-                  color: _colorEnd == true ? Colors.lightBlue : Colors.white,
-                  size: 15,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
+            _buildNavigationButtons(focus, parentFocus),
             if (state != null)
               const Icon(
                 FluentIcons.database_link_20_filled,
@@ -282,6 +113,94 @@ class _FocusIndicatorState extends ConsumerState<FocusIndicator> {
         ),
       ),
     );
+  }
+
+  Widget _buildNavigationButtons(WidgetContext focus, dynamic parentFocus) {
+    return Row(
+      children: [
+        _buildNavButton(
+          icon: UiIcons.chevron_double_left,
+          tooltip: 'Start',
+          isHovered: _colorStart,
+          onHover: (value) => setState(() => _colorStart = value),
+          onTap: () => _moveWidget(focus, parentFocus, 0),
+        ),
+        _buildNavButton(
+          icon: UiIcons.chevron_left,
+          tooltip: 'Prev',
+          isHovered: _colorPrev,
+          onHover: (value) => setState(() => _colorPrev = value),
+          onTap: () => _moveWidget(focus, parentFocus, -1),
+        ),
+        _buildNavButton(
+          icon: UiIcons.chevron_right,
+          tooltip: 'Next',
+          isHovered: _colorNext,
+          onHover: (value) => setState(() => _colorNext = value),
+          onTap: () => _moveWidget(focus, parentFocus, 1),
+        ),
+        _buildNavButton(
+          icon: UiIcons.chevron_double_right,
+          tooltip: 'End',
+          isHovered: _colorEnd,
+          onHover: (value) => setState(() => _colorEnd = value),
+          onTap: () => _moveWidget(focus, parentFocus, null),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNavButton({
+    required IconData icon,
+    required String tooltip,
+    required bool isHovered,
+    required Function(bool) onHover,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onHover: onHover,
+      onTap: onTap,
+      child: Tooltip(
+        message: tooltip,
+        child: Icon(
+          icon,
+          color: isHovered ? Colors.lightBlue : Colors.white,
+          size: 15,
+        ),
+      ),
+    );
+  }
+
+  void _moveWidget(
+      WidgetContext focus, dynamic parentFocus, int? offset) async {
+    final pathSplit = focus.path.toString().split('/');
+    final pathCheck = focus.path[focus.path.length - 2];
+    final path = pathCheck == '/'
+        ? focus.path.substring(0, focus.path.length - 2)
+        : focus.path.substring(0, focus.path.length - 3);
+
+    final currentIndex = pathCheck == '/'
+        ? int.parse(pathSplit[pathSplit.length - 1])
+        : int.parse(pathSplit[pathSplit.length - 2]);
+
+    int targetIndex;
+    if (offset == null) {
+      targetIndex = parentFocus.length - 1;
+    } else if (offset == 0) {
+      targetIndex = 0;
+    } else {
+      targetIndex = currentIndex + offset;
+    }
+
+    if (targetIndex >= 0 && targetIndex < parentFocus.length) {
+      await ref.read(canvasController).moveWidget(
+            MoveWidgetAction(
+              from: focus.path,
+              path: '$path/$targetIndex',
+              op: Operation.move,
+            ),
+          );
+    }
   }
 
   dynamic getWidgetFromPath(Map<String, dynamic> map, String path) {
@@ -301,9 +220,7 @@ class _FocusIndicatorState extends ConsumerState<FocusIndicator> {
   }
 
   bool isNumeric(String? s) {
-    if (s == null) {
-      return false;
-    }
+    if (s == null) return false;
     return double.tryParse(s) != null;
   }
 }
